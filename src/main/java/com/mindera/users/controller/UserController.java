@@ -1,5 +1,6 @@
 package com.mindera.users.controller;
 
+import com.mindera.users.dto.DtoGetAllUser;
 import com.mindera.users.dto.UserDto;
 import com.mindera.users.entity.User;
 import com.mindera.users.service.UserService;
@@ -19,13 +20,13 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getUsers() {
+    public List<DtoGetAllUser> getUsers() {
         return userService.getUsers();
     }
 
     @PostMapping
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-        User newUser = userService.addUser(user);
+    public ResponseEntity<UserDto> addUser(@RequestBody UserDto user) {
+        UserDto newUser = userService.addUser(user);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(newUser);
     }

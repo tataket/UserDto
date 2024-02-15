@@ -41,11 +41,12 @@ class UsersApplicationTests {
     @MockBean
     UsersRepository usersRepository;
     List<User> userList;
-    User user1 = new User(1L,"bruna@mail.com","Bruna","pass123");
-    User user2 = new User(2L,"chico@mail.com","Chico","pass123");
-    User user3 = new User(3L,"rodrigo@mail.com","Rodrigo","pass123");
 
-    /*
+    /* User user1 = new User(1L,"bruna@mail.com","Bruna","pass123");
+    User user2 = new User(2L,"chico@mail.com","Chico","pass123");
+    User user3 = new User(3L,"rodrigo@mail.com","Rodrigo","pass123");   */
+
+
     User user1 = User.builder()
             .id(1L)
             .username("Bruna")
@@ -65,22 +66,34 @@ class UsersApplicationTests {
             .email("rodrigo@gmail.com")
             .build();
 
-     */
-
 
     @BeforeEach
     public void setup() {
+        User user1 = User.builder()
+                .id(1L)
+                .username("Bruna")
+                .password("111")
+                .email("bruna@gmail.com")
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .username("Chico")
+                .password("222")
+                .email("chico@gmail.com")
+                .build();
+        User user3 = User.builder()
+                .id(3L)
+                .username("Rodrigo")
+                .password("333")
+                .email("rodrigo@gmail.com")
+                .build();
         userList = new ArrayList<>(Arrays.asList(user1, user2, user3));
         Mockito.mock(UsersRepository.class);
     }
 
     @Test
     void getAllUserSuccess() throws Exception {
-
-        List<User> userList = new ArrayList<>(Arrays.asList(user1, user2, user3));
-
         Mockito.when(usersRepository.findAll()).thenReturn(userList);
-
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/user")
                         .contentType(MediaType.APPLICATION_JSON))

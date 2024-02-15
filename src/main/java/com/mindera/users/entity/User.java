@@ -15,15 +15,12 @@ import lombok.*;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
     private Long id;
 
-    @Column(unique = true)
+    @Column(nullable = false)
     private String email;
-
-    /* @Column(nullable = false)
-    private String address; */
 
     @Column(nullable = false)
     private String username;
