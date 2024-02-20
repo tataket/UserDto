@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,12 +39,13 @@ class UsersApplicationTests {
     ObjectMapper mapper;
     @MockBean
     UsersRepository usersRepository;
-    List<User> userList;
-    User user1 = new User(1L,"bruna@mail.com","Bruna","pass123");
-    User user2 = new User(2L,"chico@mail.com","Chico","pass123");
-    User user3 = new User(3L,"rodrigo@mail.com","Rodrigo","pass123");
 
-    /*
+    List<User> userList;
+//    User user1 = new User(1L,"bruna@mail.com","Bruna","pass123");
+//    User user2 = new User(2L,"chico@mail.com","Chico","pass123");
+//    User user3 = new User(3L,"rodrigo@mail.com","Rodrigo","pass123");
+
+
     User user1 = User.builder()
             .id(1L)
             .username("Bruna")
@@ -65,7 +65,7 @@ class UsersApplicationTests {
             .email("rodrigo@gmail.com")
             .build();
 
-     */
+
 
 
     @BeforeEach
@@ -76,9 +76,7 @@ class UsersApplicationTests {
 
     @Test
     void getAllUserSuccess() throws Exception {
-
-        List<User> userList = new ArrayList<>(Arrays.asList(user1, user2, user3));
-
+        User user = new User(1L, "teste", "lol", "lol");
         Mockito.when(usersRepository.findAll()).thenReturn(userList);
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -295,6 +293,16 @@ class UsersApplicationTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
         Mockito.verify(usersRepository, Mockito.times(0)).deleteById(idTest);
+    }
+
+    //-----------------------> unit tests <-------------------------//
+
+    @Test
+    void getAllUsersWithUnitTestsSuccess() {
+        User userTest = new User(1L, "bruna@gmail.com", "Bruna", "111");
+
+
+
     }
 }
 

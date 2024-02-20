@@ -1,6 +1,5 @@
 package com.mindera.users.service;
 
-import com.mindera.users.dto.UserDto;
 import com.mindera.users.entity.User;
 import com.mindera.users.exception.InvalidRequestException;
 import com.mindera.users.exception.NotFoundException;
@@ -8,7 +7,6 @@ import com.mindera.users.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +15,15 @@ import java.util.Optional;
 public class UserService {
     private final UsersRepository repository;
 
-    public List<UserDto> getUsers() {
-        return repository.findAll()
-                .stream().sorted(Comparator.comparing(User::getId))
-                .map(user -> new UserDto((user.getUsername()), user.getPassword(), user.getEmail()))
-                .toList();
+//    public List<UserDto> getUsers() {
+//        return repository.findAll()
+//                .stream().sorted(Comparator.comparing(User::getId))
+//                .map(user -> new UserDto((user.getUsername()), user.getPassword(), user.getEmail()))
+//                .toList();
+//    }
+
+    public List<User> getUsers(){
+      return repository.findAll().stream().toList();
     }
 
     public User addUser(User user) {
@@ -32,7 +34,6 @@ public class UserService {
         newUser.setUsername(user.getUsername());
         newUser.setPassword(user.getPassword());
         newUser.setEmail(user.getEmail());
-        //newUser.setAddress(user.getAddress());
         repository.save(newUser);
         return newUser;
     }
@@ -50,7 +51,6 @@ public class UserService {
                 userUp.setUsername(user.getUsername());
                 userUp.setPassword(user.getPassword());
                 userUp.setEmail(user.getEmail());
-                // userUp.setAddress(user.getAddress());
             }
             repository.save(userUp);
             return userUp;
@@ -79,9 +79,6 @@ public class UserService {
         if (user.getEmail() != null) {
             userExist.setEmail(user.getEmail());
         }
-        /* if (user.getAddress() != null){
-            userExist.setAddress(user.getAddress());
-        } */
         repository.save(userExist);
         return userExist;
     }
