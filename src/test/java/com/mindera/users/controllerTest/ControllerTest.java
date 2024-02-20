@@ -1,6 +1,7 @@
-package com.mindera.users;
+package com.mindera.users.controllerTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindera.users.dto.UserDto;
 import com.mindera.users.entity.User;
 import com.mindera.users.repository.UsersRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,12 +27,13 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest
-class UsersApplicationTests {
+public class ControllerTest {
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -41,10 +42,6 @@ class UsersApplicationTests {
     UsersRepository usersRepository;
 
     List<User> userList;
-//    User user1 = new User(1L,"bruna@mail.com","Bruna","pass123");
-//    User user2 = new User(2L,"chico@mail.com","Chico","pass123");
-//    User user3 = new User(3L,"rodrigo@mail.com","Rodrigo","pass123");
-
 
     User user1 = User.builder()
             .id(1L)
@@ -66,8 +63,6 @@ class UsersApplicationTests {
             .build();
 
 
-
-
     @BeforeEach
     public void setup() {
         userList = new ArrayList<>(Arrays.asList(user1, user2, user3));
@@ -76,7 +71,6 @@ class UsersApplicationTests {
 
     @Test
     void getAllUserSuccess() throws Exception {
-        User user = new User(1L, "teste", "lol", "lol");
         Mockito.when(usersRepository.findAll()).thenReturn(userList);
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -101,10 +95,15 @@ class UsersApplicationTests {
 
     @Test
     void addUserSuccess() throws Exception {
-        User userAdd = User.builder()
-                .id(4L)
+        UserDto userDto = UserDto.builder()
                 .username("Fatima")
-                .password("4444")
+                .password("123")
+                .email("ola@email.com").build();
+
+        User userAdd = User.builder()
+                .username(userDto.getUsername())
+                .password(userDto.getPassword())
+                .email(userDto.getEmail())
                 .build();
 
         Mockito.when(usersRepository.save(userAdd)).thenReturn(userAdd);
@@ -124,18 +123,20 @@ class UsersApplicationTests {
     }
 
     @Test
-    void addUserNoSuccess_MissArgs() throws Exception {
-        User userTestAdd = User.builder()
-                .id(5L)
+    void addUser_NoSuccess_MissArgs() throws Exception {
+        UserDto userTestAdd = UserDto.builder()
+                .username(null)
                 .build();
-        Mockito.when(usersRepository.save(userTestAdd)).thenReturn(userTestAdd);
+
+        User user = User.builder()
+                .username(userTestAdd.getUsername()).build();
+
+        Mockito.when(usersRepository.save(user)).thenReturn(user);
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(this.mapper.writeValueAsString(userTestAdd)))
                 .andExpect(status().isBadRequest());
-
-
     }
 
     @Test
@@ -228,7 +229,7 @@ class UsersApplicationTests {
                 .andDo(e -> System.out.println(e.getResponse().getContentAsString()));
     }
 
-    private static Stream<Arguments> testUpdatePatchUserIsOkArgs(){
+    private static Stream<Arguments> testUpdatePatchUserIsOkArgs() {
         return Stream.of(
                 Arguments.of("username", null),
                 Arguments.of(null, "password"),
@@ -249,7 +250,7 @@ class UsersApplicationTests {
         Mockito.when(usersRepository.save(userList.get((int) idUpdated))).thenReturn(userUpdatedPatch);
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = MockMvcRequestBuilders
-                .patch("/user/{id}",1)
+                .patch("/user/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(this.mapper.writeValueAsString(userUpdatedPatch));
@@ -295,15 +296,4 @@ class UsersApplicationTests {
         Mockito.verify(usersRepository, Mockito.times(0)).deleteById(idTest);
     }
 
-    //-----------------------> unit tests <-------------------------//
-
-    @Test
-    void getAllUsersWithUnitTestsSuccess() {
-        User userTest = new User(1L, "bruna@gmail.com", "Bruna", "111");
-
-
-
-    }
 }
-
-
