@@ -1,6 +1,5 @@
 package com.mindera.users.controller;
 
-import com.mindera.users.dto.UserDto;
 import com.mindera.users.entity.User;
 import com.mindera.users.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getUsers() {
+    public List<User> getUsers() {
         return userService.getUsers();
     }
 
