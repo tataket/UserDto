@@ -17,13 +17,6 @@ import java.util.Optional;
 public class UserService {
     private final UsersRepository repository;
 
-//    public List<UserDto> getUsers() {
-//        return repository.findAll()
-//                .stream().sorted(Comparator.comparing(User::getId))
-//                .map(user -> new UserDto((user.getUsername()), user.getPassword(), user.getEmail()))
-//                .toList();
-//    }
-
     public List<UserDto> getUsers() {
         return repository.findAll().stream()
                 .map(e -> new UserDto(e.getUsername(), e.getPassword(), e.getEmail(), e.getAddress())).toList();

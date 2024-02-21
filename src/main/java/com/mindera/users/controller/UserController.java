@@ -1,11 +1,10 @@
 package com.mindera.users.controller;
 
 import com.mindera.users.dto.UserDto;
-import com.mindera.users.entity.User;
+
 import com.mindera.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
