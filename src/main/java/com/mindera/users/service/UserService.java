@@ -1,10 +1,12 @@
 package com.mindera.users.service;
 
+import com.mindera.users.dto.UserDto;
 import com.mindera.users.entity.User;
 import com.mindera.users.exception.InvalidRequestException;
 import com.mindera.users.exception.NotFoundException;
 import com.mindera.users.repository.UsersRepository;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,72 +17,70 @@ import java.util.Optional;
 public class UserService {
     private final UsersRepository repository;
 
-//    public List<UserDto> getUsers() {
-//        return repository.findAll()
-//                .stream().sorted(Comparator.comparing(User::getId))
-//                .map(user -> new UserDto((user.getUsername()), user.getPassword(), user.getEmail()))
-//                .toList();
-//    }
-
-    public List<User> getUsers(){
-      return repository.findAll().stream().toList();
+    public List<UserDto> getUsers() {
+        return repository.findAll().stream()
+                .map(e -> new UserDto(e.getUsername(), e.getPassword(), e.getEmail(), e.getAddress())).toList();
     }
 
-    public User addUser(User user) {
-        User newUser = new User();
-        if (user.getUsername() == null && user.getPassword() == null && user.getEmail() == null) {
+    public UserDto addUser(UserDto userDto) {
+        if (userDto.getUsername() == null || userDto.getPassword() == null || userDto.getEmail() == null)
             throw new InvalidRequestException("miss args");
-        }
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(user.getPassword());
-        newUser.setEmail(user.getEmail());
+
+        User newUser = new User();
+        newUser.setUsername(userDto.getUsername());
+        newUser.setPassword(userDto.getPassword());
+        newUser.setEmail(userDto.getEmail());
         repository.save(newUser);
-        return newUser;
+        userDto.setPassword(null);
+        return userDto;
     }
 
 
-    public Optional<User> findById(Long userId) {
-        return Optional.ofNullable(repository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!")));
+    public UserDto findById(Long userId) {
+        Optional<User> user = Optional.ofNullable(repository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!")));
+        return new UserDto(user.get().getUsername(), null, user.get().getEmail(), user.get().getAddress());
     }
 
-    public User updateUser(Long userId, User user) {
-        Optional<User> userOptional = repository.findById(userId);
-        if (userOptional.isPresent()) {
-            User userUp = userOptional.get();
-            if (user.getUsername() != null && user.getPassword() != null && user.getEmail() != null) {
-                userUp.setUsername(user.getUsername());
-                userUp.setPassword(user.getPassword());
-                userUp.setEmail(user.getEmail());
-            }
-            repository.save(userUp);
-            return userUp;
+    public UserDto updateUser(Long userId, UserDto userDto) {
+
+        Optional<User> userOp = repository.findById(userId);
+
+        if (userOp.isEmpty()) throw new NotFoundException("Invalid User body request");
+
+        if (userDto.getUsername() != null && userDto.getPassword() != null && userDto.getEmail() != null && userDto.getAddress() != null) {
+            userOp.get().setUsername(userDto.getUsername());
+            userOp.get().setPassword(userDto.getPassword());
+            userOp.get().setEmail(userDto.getEmail());
+            userOp.get().setAddress(userDto.getAddress());
+            User user = userOp.get();
+            repository.save(user);
         }
-        throw new NotFoundException("Invalid User body request");
+        return userDto;
     }
 
     public void deleteUser(Long userId) {
-        if (repository.findById(userId).isEmpty()) {
-            throw new NotFoundException("User not found");
-        }
+        if (repository.findById(userId).isEmpty()) throw new NotFoundException("User not found");
+
         repository.deleteById(userId);
     }
 
 
-    public User updateUserDetail(Long userId, User user) {
-        User userExist = repository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Invalid User body request"));
+    public UserDto updateUserDetail(Long userId, UserDto userDto) {
+        Optional<User> userExist = Optional.ofNullable(repository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Invalid User body request")));
 
-        if (user.getUsername() != null) {
-            userExist.setUsername(user.getUsername());
-        }
-        if (user.getPassword() != null) {
-            userExist.setPassword(user.getPassword());
-        }
-        if (user.getEmail() != null) {
-            userExist.setEmail(user.getEmail());
-        }
-        repository.save(userExist);
-        return userExist;
+        if (userDto.getUsername() != null) userExist.get().setUsername(userDto.getUsername());
+
+        if (userDto.getPassword() != null) userExist.get().setPassword(userDto.getPassword());
+
+        if (userDto.getEmail() != null) userExist.get().setEmail(userDto.getEmail());
+
+        repository.save(User.builder()
+                .username(userDto.getUsername())
+                .password(userDto.getPassword())
+                .email(userDto.getEmail())
+                .address(userDto.getAddress()).build());
+
+        return new UserDto(userDto.getUsername(), userDto.getPassword(), userDto.getEmail(), userDto.getAddress());
     }
-
 }
